@@ -1,6 +1,7 @@
 package productcontroller
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/Shiirookami/restapi_gin/models"
@@ -41,8 +42,34 @@ func Create(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"product": product})
 }
 func Update(c *gin.Context) {
+	var product models.Product
+	id := c.Param("id")
 
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if models.DB.Model(&product).Where("id = ?", id).Updates(&product).RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Product not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"Message": "Product Updated"})
 }
 func Delete(c *gin.Context) {
+	var product models.Product
 
+	var number struct {
+		Id json.Number
+	}
+	if err := c.ShouldBindJSON(&number); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id, _ := number.Id.Int64()
+	if models.DB.Delete(&product, id).RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"Message": "Product Has Deleted"})
 }
