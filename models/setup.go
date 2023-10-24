@@ -1,16 +1,18 @@
 package models
 
-import {
+import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-}
-var database *gorm.DB
+)
+
+var DB *gorm.DB
+
 func ConnectDB() {
 	db, err := gorm.Open(mysql.Open("root:@tcp(127.0.0.1:3306)/mikti"))
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect DB")
 	}
 	db.AutoMigrate(&Product{})
 
-	database = db
+	DB = db
 }

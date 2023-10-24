@@ -1,21 +1,20 @@
 package main
 
-import {
-	"github.com/gin-gonic/gin"
+import (
+	"github.com/Shiirookami/restapi_gin/controllers/productcontroller"
 	"github.com/Shiirookami/restapi_gin/models"
-	"github.com/Shiirookami/restapi_gin/controllers/ProductController"
-
-}
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	test := gin.Default()
 	models.ConnectDB()
 
-	test.Get("/api/products", ProductController.Index)
-	test.Get("/api/products/:id", ProductController.Show)
-	test.Post("/api/products", ProductController.Create)
-	test.Put("/api/products/:id", ProductController.Update)
-	test.Delete("/api/products", ProductController.Delete)
+	test.GET("/api/products", productcontroller.Index)
+	test.GET("/api/product/:id", productcontroller.Show)
+	test.POST("/api/product", productcontroller.Create)
+	test.PUT("/api/product/:id", productcontroller.Update)
+	test.DELETE("/api/product", productcontroller.Delete)
 
 	test.Run()
 }
