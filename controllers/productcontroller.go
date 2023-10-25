@@ -1,25 +1,25 @@
-package productcontroller
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Shiirookami/restapi_gin/models"
+	"github.com/Shiirookami/restapi_gin/entity"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func Index(c *gin.Context) {
-	var products []models.Product
+	var products []entity.Product
 
-	models.DB.Find(&products)
+	entity.DB.Find(&products)
 	c.JSON(http.StatusOK, gin.H{("products"): products})
 }
 func Show(c *gin.Context) {
-	var Product models.Product
+	var Product entity.Product
 	id := c.Param("id")
 
-	if err := models.DB.First(&Product, id).Error; err != nil {
+	if err := entity.DB.First(&Product, id).Error; err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
@@ -32,31 +32,31 @@ func Show(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"product": Product})
 }
 func Create(c *gin.Context) {
-	var product models.Product
+	var product entity.Product
 
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	models.DB.Create(&product)
+	entity.DB.Create(&product)
 	c.JSON(http.StatusOK, gin.H{"product": product})
 }
 func Update(c *gin.Context) {
-	var product models.Product
+	var product entity.Product
 	id := c.Param("id")
 
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if models.DB.Model(&product).Where("id = ?", id).Updates(&product).RowsAffected == 0 {
+	if entity.DB.Model(&product).Where("id = ?", id).Updates(&product).RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Product not found"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"Message": "Product Updated"})
 }
 func Delete(c *gin.Context) {
-	var product models.Product
+	var product entity.Product
 
 	var number struct {
 		Id json.Number
@@ -67,7 +67,7 @@ func Delete(c *gin.Context) {
 	}
 
 	id, _ := number.Id.Int64()
-	if models.DB.Delete(&product, id).RowsAffected == 0 {
+	if entity.DB.Delete(&product, id).RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
